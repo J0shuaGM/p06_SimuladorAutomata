@@ -52,9 +52,9 @@ const bool Automata::Simulacion(Cadena cadena) {
         int destino = it->second;
         siguientes.insert(destino);
       }
-      estados_actuales = std::move(siguientes);
-      if (estados_actuales.empty()) return false;
     }
+    estados_actuales = std::move(siguientes);
+    if (estados_actuales.empty()) return false;
   }
   for(int e : estados_actuales) {
     if (estados_finales_.count(e)) return true;
