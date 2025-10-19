@@ -56,8 +56,12 @@ Automata::Automata(const std::string& fichero) {
 const bool Automata::Simulacion(Cadena cadena) {
   std::vector<char> simbolos = cadena.getCadena();
   std::set<int> estados_actuales = {estado_inicial_};
+
+  //Recorremos cada simbolo de la cadena
   for(char c : simbolos) {
     std::set<int> siguientes;
+
+    //Para cada estado actual buscamos transiciones con ese simbolo
     for(int e : estados_actuales) {
       const auto& transiciones = estados_.at(e).getTransiciones();
       auto rango = transiciones.equal_range(c);
@@ -67,8 +71,12 @@ const bool Automata::Simulacion(Cadena cadena) {
       }
     }
     estados_actuales = std::move(siguientes);
+
+    //Si en algun momento no hay estados posibles, podemos cortar
     if (estados_actuales.empty()) return false;
   }
+  
+  //Finalmente buscamos si el estado actual es final para aceptar
   for(int e : estados_actuales) {
     if (estados_finales_.count(e)) return true;
   }
