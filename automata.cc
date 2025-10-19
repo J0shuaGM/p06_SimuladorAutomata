@@ -61,3 +61,26 @@ const bool Automata::Simulacion(Cadena cadena) {
   }
   return false;
 }
+
+std::istream& operator>>(std::istream& entrada, Automata& automata) {
+  std::string nombre_fichero;
+  entrada >> nombre_fichero;
+  automata = Automata(nombre_fichero);
+  return entrada;
+}
+
+std::ostream& operator<<(std::ostream& salida, const Automata& automata) {
+  salida << "Alfabeto: " << automata.alfabeto_ << std::endl;
+  salida << "Numero de estados: " << automata.numero_estados_ << std::endl;
+  salida << "Estado inicial: " << automata.estado_inicial_ << std::endl;
+  salida << "Estados finales: ";
+  for (const int estado_final : automata.estados_finales_) {
+    salida << estado_final << " ";
+  }
+  salida << std::endl;
+  salida << "Estados y transiciones:" << std::endl;
+  for (const auto& par : automata.estados_) {
+    salida << par.second << std::endl;
+  }
+  return salida;
+}

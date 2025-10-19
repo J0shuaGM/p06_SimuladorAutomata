@@ -70,10 +70,10 @@ void Alfabeto::insertar(char c) {
 }
 
 bool Alfabeto::search(char c) {
-  if(simbolos_.find(c) == simbolos_.end()) {
-    return false;
-  } else if (c == '&') {
+  if(c == '&') {
     return true;
-  }
+  } else if(simbolos_.find(c) == simbolos_.end()) {
+    return false;
+  } 
   return true;
 }

@@ -42,8 +42,8 @@ class Automata {
     const bool Simulacion(Cadena cadena);
 
     //Sobrecarga de operadores
+    friend std::istream& operator>>(std::istream& entrada, Automata& automata);
     friend std::ostream& operator<<(std::ostream& salida, const Automata& automata);
-    friend std::istream operator>>(std::istream entrada, Automata automata);
 
   private:
     int numero_estados_;

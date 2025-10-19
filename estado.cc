@@ -38,3 +38,21 @@ Estado::Estado(const std::string& datos) {
     }
   }
 }
+
+std::istream& operator>>(std::istream& entrada, Estado& estados) {
+  std::string cadena_datos;
+  entrada >> cadena_datos; 
+  estados = Estado(cadena_datos);
+  return entrada;
+}
+
+std::ostream& operator<<(std::ostream& salida, const Estado& estados) {
+  salida << "Estado: " << estados.id_ << "\n";
+  salida << "Aceptacion: " << estados.final_ << "\n";
+  salida << "Numero de transiciones: " << estados.numero_transiciones_ << "\n";
+  salida << "Transiciones: \n";
+  for (const auto& transicion : estados.transiciones_) {
+    salida << "  Simbolo: " << transicion.first << " -> Destino: " << transicion.second << "\n";
+  } 
+  return salida;
+}

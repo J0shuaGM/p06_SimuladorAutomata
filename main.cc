@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
   std::string fichero_automata = argv[1];
   std::string fichero_cadenas = argv[2];
   Automata automata(fichero_automata);
+  //std::cout << automata;
   SimulacionAutomata(automata, fichero_cadenas);
   return 0;
 }

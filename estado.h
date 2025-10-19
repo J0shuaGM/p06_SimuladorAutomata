@@ -34,6 +34,10 @@ class Estado {
     void setTransiciones(char clave, int valor) { transiciones_.insert({clave, valor}); }
     void setNumeroTransiciones(int numero) { numero_transiciones_ = numero; }
     void setAceptacion(bool aceptacion) { final_ = aceptacion; }
+
+    //Sobrecarga de operadores
+    friend std::istream& operator>>(std::istream& entrada, Estado& estados);
+    friend std::ostream& operator<<(std::ostream& salida, const Estado& estados);
     
   private:
     int id_; 
