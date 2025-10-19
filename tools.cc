@@ -53,6 +53,13 @@ void Usage(int argc, char* argv[]) {
   }
 }
 
+
+
+/**
+ * @brief Funcion encargada de gestionar la simulacion del automata
+ * @param automata Objeto Automata que contiene los datos del automata
+ * @param fichero_cadenas variable que indica el nombre del fichero que contiene las cadenas a ser comprobadas
+*/
 void SimulacionAutomata(Automata automata, const std::string& fichero_cadenas) {
   Alfabeto alfabeto_automata = automata.getAlfabeto();
   bool pertenece_alfabeto;

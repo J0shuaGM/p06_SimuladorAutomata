@@ -15,6 +15,12 @@
 
 #include "automata.h"
 
+
+
+/**
+ * @brief Constructor parametrizado de la clase Automata
+ * @param fichero Cadena que contiene el nombre del fichero con los datos 
+*/
 Automata::Automata(const std::string& fichero) {
   std::ifstream input(fichero); 
   if(!input.is_open()) {
@@ -40,6 +46,13 @@ Automata::Automata(const std::string& fichero) {
   input.close();
 }
 
+
+
+/**
+ * @brief Metodo que Simula el funcionamiento del automata para comporbar cadenass
+ * @param cadena Objeto Cadena a comprobar por el automata
+ * @return bool que determina si una cadena es o no acpetada por el automata
+*/
 const bool Automata::Simulacion(Cadena cadena) {
   std::vector<char> simbolos = cadena.getCadena();
   std::set<int> estados_actuales = {estado_inicial_};
@@ -62,6 +75,14 @@ const bool Automata::Simulacion(Cadena cadena) {
   return false;
 }
 
+
+
+/**
+ * @brief Sobrecarga del insercion de extraccion para el objeto Automata
+ * @param entrada Variable para recibir la entrada de datos
+ * @param Automata Objeto automata que va a ser sobreescrito
+ * @return entrada Retornamos el nuevo valor 
+*/
 std::istream& operator>>(std::istream& entrada, Automata& automata) {
   std::string nombre_fichero;
   entrada >> nombre_fichero;
@@ -69,6 +90,14 @@ std::istream& operator>>(std::istream& entrada, Automata& automata) {
   return entrada;
 }
 
+
+
+/**
+ * @brief Sobrecarga del operador de extraccion para el objeto Automata
+ * @param entrada Variable para escribir la salida de datos
+ * @param automata Objeto automata que va a ser sobreescrito
+ * @return salida Retornamos el nuevo valor 
+*/
 std::ostream& operator<<(std::ostream& salida, const Automata& automata) {
   salida << "Alfabeto: " << automata.alfabeto_ << std::endl;
   salida << "Numero de estados: " << automata.numero_estados_ << std::endl;
