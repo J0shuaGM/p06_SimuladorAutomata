@@ -18,5 +18,9 @@
 
 int main(int argc, char* argv[]) {
   Usage(argc, argv);
+  std::string fichero_automata = argv[1];
+  std::string fichero_cadenas = argv[2];
+  Automata automata(fichero_automata);
+  SimulacionAutomata(automata, fichero_cadenas);
   return 0;
 }

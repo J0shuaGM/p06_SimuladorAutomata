@@ -22,19 +22,21 @@
 class Automata {
   public:
     //Constructor
-    Automata(std::string fichero);
+    Automata(const std::string& fichero);
 
     //Getters
     Alfabeto getAlfabeto(void) { return alfabeto_; }
     std::map<int, Estado> getEstados(void) { return estados_; }
-    Estado getEstadoInicial(void) { return estado_inicial_; }
+    int getEstadoInicial(void) { return estado_inicial_; }
     std::set<int> getEstadosFinales(void) { return estados_finales_; }
+    int getNuemeroEstados(void) { return numero_estados_; }
 
     //Setters
     void setAlfabeto(Alfabeto alfabeto) { alfabeto_ = alfabeto; }
     void setEstados(int id, Estado estado) { estados_.insert({id, estado}); }
-    void setEstadoInicial(Estado estado_inicial) { estado_inicial_ = estado_inicial; }
+    void setEstadoInicial(int estado_inicial) { estado_inicial_ = estado_inicial; }
     void setEstadoFinal(int id) { estados_finales_.insert(id); }
+    void setNumeroEstados(int numero) { numero_estados_ = numero;}
 
     //Metodos
     const bool Simulacion(Cadena cadena);
@@ -44,9 +46,10 @@ class Automata {
     friend std::istream operator>>(std::istream entrada, Automata automata);
 
   private:
+    int numero_estados_;
     Alfabeto alfabeto_;
     std::map<int, Estado> estados_; //id -> Estado
-    Estado estado_inicial_;
+    int estado_inicial_; //id del estado inicial
     std::set<int> estados_finales_; //Se almacenan los id de los estados finales
 }; 
 

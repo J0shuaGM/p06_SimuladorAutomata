@@ -15,7 +15,6 @@
 #include "automata.h"
 #include "estado.h"
 
-void Usage(int argc, char* argv[]);
 const std::string helptext = R"(El autómata finito vendrá definido en un fichero de texto con extensión .fa. Los ficheros
 .fa deberán tener el siguiente formato:
 Línea 1: Símbolos del alfabeto separados por espacios.
@@ -33,3 +32,5 @@ los siguientes números, separados entre sí por espacios en blanco:
     ◦ Símbolo de entrada necesario para que se produzca la transición. Para representar la cadena vacía (el no consumir símbolo de la entrada) se utilizará
         el carácter &
     ◦ Estado destino de la transición)";
+void Usage(int argc, char* argv[]);
+void SimulacionAutomata(Automata automata, const std::string& fichero_cadenas);

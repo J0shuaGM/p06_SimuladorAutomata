@@ -9,6 +9,7 @@
 // Fecha: 17/10/2025
 
 #include <iostream>
+#include <fstream>
 
 #include "tools.h"
 
@@ -52,3 +53,30 @@ void Usage(int argc, char* argv[]) {
   }
 }
 
+void SimulacionAutomata(Automata automata, const std::string& fichero_cadenas) {
+  Alfabeto alfabeto_automata = automata.getAlfabeto();
+  bool pertenece_alfabeto;
+  std::ifstream entrada(fichero_cadenas); 
+  if(!entrada.is_open()) {
+    std::cerr << "El fichero de cadenas no se ha podido abrir" << std::endl;
+    return;
+  }
+  std::string cadenas; 
+  while(std::getline(entrada, cadenas)) {
+    Cadena cadena(cadenas);
+    std::vector<char> simbolos = cadena.getCadena();
+    for(char c : simbolos) {
+      pertenece_alfabeto = alfabeto_automata.search(c);
+    }
+    if (pertenece_alfabeto) {
+      if (automata.Simulacion(cadena)) {
+        std::cout << cadena << " --- Accepted" << std::endl;
+      } else {
+        std::cout << cadena << " --- Rejected" << std::endl;
+      }
+    } else {
+      std::cout << cadena << " No pertenece al alfabeto" << std::endl;
+    }
+  }
+  entrada.close();
+}

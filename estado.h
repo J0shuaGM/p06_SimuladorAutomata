@@ -17,7 +17,8 @@
 class Estado {
   public: 
     //Constructor
-    Estado(const std::string datos);
+    Estado() {};
+    Estado(const std::string& datos);
 
     //Destructor
     ~Estado() {};
@@ -25,13 +26,19 @@ class Estado {
     //Getters
     char getNombre(void) { return id_; }
     std::multimap<char, int> getTransiciones(void) { return transiciones_; }
+    bool getFinal(void) { return final_; }
+    int getNumeroTransiciones(void) { return numero_transiciones_; }
 
     //Setters
     void setNombre(char nombre) { id_ = nombre; }
     void setTransiciones(char clave, int valor) { transiciones_.insert({clave, valor}); }
+    void setNumeroTransiciones(int numero) { numero_transiciones_ = numero; }
+    void setAceptacion(bool aceptacion) { final_ = aceptacion; }
+    
   private:
     int id_; 
     bool final_;
+    int numero_transiciones_;
     std::multimap<char, int> transiciones_; // clave->valor (simbolo->numero estado siguiente)
 };
 
