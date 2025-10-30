@@ -91,6 +91,45 @@ const bool Automata::Simulacion(Cadena cadena) {
  * @param Automata Objeto automata que va a ser sobreescrito
  * @return entrada Retornamos el nuevo valor 
 */
+void Automata::Gramatica() {
+  std::ofstream out("gramatica.txt"); 
+  out << alfabeto_ << std::endl;
+  out << numero_estados_ << std::endl;
+  std::vector<char> nuevos_id; 
+  for (int i = 0; i < numero_estados_; ++i) {
+    nuevos_id.push_back(estados_.at(i).getNombre() + 'A');
+  }
+  out << nuevos_id[0] << std::endl;
+
+  for (auto it = estados_.begin(); it != estados_.end(); ++it) {
+    int iterador = 0;
+    int id = it->first;
+    const Estado& estado = it->second;
+
+    std::vector<std::string> producciones;
+    const std::multimap<char, int>& transiciones = estados_.at(iterador).getTransiciones();
+
+    for (auto t = transiciones.begin(); t != transiciones.end(); ++t) {
+      char simbolo = t->first;
+      int destino = t->second;
+
+      if (std::isdigit(simbolo)) simbolo = 'A' + (simbolo - '0');
+
+      std::string prod;
+      prod += simbolo;
+      prod += "Q" + std::to_string(destino);
+      producciones.push_back(prod);
+    }
+    out << producciones[iterador] << std::endl;
+    iterador++;
+  }
+}
+/**
+ * @brief Sobrecarga del insercion de extraccion para el objeto Automata
+ * @param entrada Variable para recibir la entrada de datos
+ * @param Automata Objeto automata que va a ser sobreescrito
+ * @return entrada Retornamos el nuevo valor 
+*/
 std::istream& operator>>(std::istream& entrada, Automata& automata) {
   std::string nombre_fichero;
   entrada >> nombre_fichero;

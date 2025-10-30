@@ -40,6 +40,7 @@ class Automata {
 
     //Metodos
     const bool Simulacion(Cadena cadena);
+    void Gramatica();
 
     //Sobrecarga de operadores
     friend std::istream& operator>>(std::istream& entrada, Automata& automata);

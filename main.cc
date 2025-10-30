@@ -23,5 +23,6 @@ int main(int argc, char* argv[]) {
   Automata automata(fichero_automata);
   //std::cout << automata;
   SimulacionAutomata(automata, fichero_cadenas);
+  automata.Gramatica();
   return 0;
 }
