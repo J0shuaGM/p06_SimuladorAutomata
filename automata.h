@@ -3,7 +3,7 @@
 // Grado en Ingenierıa Informatica
 // Asignatura: Computabilidad y Algoritmia
 // Curso: 2º
-// Practica 6: Diseño e implementación deun simulador de autómatas finitos
+// Practica 6: Diseño e implementación de un simulador de DFAs
 // Autor: Joshua Gomez Marrero
 // Correo: alu0101477398@ull.edu.es
 // Fecha: 17/10/2025
@@ -29,7 +29,7 @@ class Automata {
     std::map<int, Estado> getEstados(void) { return estados_; }
     int getEstadoInicial(void) { return estado_inicial_; }
     std::set<int> getEstadosFinales(void) { return estados_finales_; }
-    int getNuemeroEstados(void) { return numero_estados_; }
+    int getNumeroEstados(void) { return numero_estados_; }
 
     //Setters
     void setAlfabeto(Alfabeto alfabeto) { alfabeto_ = alfabeto; }
@@ -40,15 +40,16 @@ class Automata {
 
     //Metodos
     const bool Simulacion(Cadena cadena);
-    void Gramatica();
 
     //Sobrecarga de operadores
     friend std::istream& operator>>(std::istream& entrada, Automata& automata);
     friend std::ostream& operator<<(std::ostream& salida, const Automata& automata);
 
   private:
-    int numero_estados_;
-    Alfabeto alfabeto_;
+    void Validar(void); // Comprueba que la definicion leida es la de un DFA correcto
+
+    int numero_estados_; // Numero total de estados del automata
+    Alfabeto alfabeto_; // Alfabeto de entrada del automata
     std::map<int, Estado> estados_; //id -> Estado
     int estado_inicial_; //id del estado inicial
     std::set<int> estados_finales_; //Se almacenan los id de los estados finales

@@ -3,7 +3,7 @@
 // Grado en Ingenierıa Informatica
 // Asignatura: Computabilidad y Algoritmia
 // Curso: 2º
-// Practica 6: Diseño e implementación deun simulador de autómatas finitos
+// Practica 6: Diseño e implementación de un simulador de DFAs
 // Autor: Joshua Gomez Marrero
 // Correo: alu0101477398@ull.edu.es
 // Fecha: 17/10/2025
@@ -69,11 +69,11 @@ void Alfabeto::insertar(char c) {
   simbolos_.insert(c);
 }
 
+/**
+ * @brief Comprueba si un simbolo pertenece al alfabeto
+ * @param c Simbolo a buscar
+ * @return true si el simbolo pertenece al alfabeto
+*/
 bool Alfabeto::search(char c) {
-  if(c == '&') {
-    return true;
-  } else if(simbolos_.find(c) == simbolos_.end()) {
-    return false;
-  } 
-  return true;
+  return simbolos_.find(c) != simbolos_.end();
 }

@@ -3,7 +3,7 @@
 // Grado en Ingenierıa Informatica
 // Asignatura: Computabilidad y Algoritmia
 // Curso: 2º
-// Practica 6: Diseño e implementación deun simulador de autómatas finitos
+// Practica 6: Diseño e implementación de un simulador de DFAs
 // Autor: Joshua Gomez Marrero
 // Correo: alu0101477398@ull.edu.es
 // Fecha: 17/10/2025
@@ -23,6 +23,5 @@ int main(int argc, char* argv[]) {
   Automata automata(fichero_automata);
   //std::cout << automata;
   SimulacionAutomata(automata, fichero_cadenas);
-  automata.Gramatica();
   return 0;
 }

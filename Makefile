@@ -3,14 +3,14 @@
 # Grado en Ingenieria Informatica
 # Asignatura: Computabilidad y Algoritmia
 # Curso: 2º
-# Practica 6: Diseño e implementación deun simulador de autómatas finitos
+# Practica 6: Diseño e implementación de un simulador de DFAs
 # Autor: Joshua Gomez Marrero
 # Correo: alu0101477398@ull.edu.es
 # Fecha: 17/10/2025
 # Archivo: Makefile
 
 # Nombre del archivo de salida
-TARGET = Automata
+TARGET = p06_DFA_simulator
 
 # Lista de archivos fuente(.cc)
 SOURCES = alfabeto.cc automata.cc cadena.cc estado.cc main.cc tools.cc 

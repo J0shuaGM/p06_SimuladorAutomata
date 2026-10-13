@@ -3,7 +3,7 @@
 // Grado en Ingenierıa Informatica
 // Asignatura: Computabilidad y Algoritmia
 // Curso: 2º
-// Practica 6: Diseño e implementación deun simulador de autómatas finitos
+// Practica 6: Diseño e implementación de un simulador de DFAs
 // Autor: Joshua Gomez Marrero
 // Correo: alu0101477398@ull.edu.es
 // Fecha: 17/10/2025
@@ -19,38 +19,17 @@
  * @param agrv Las cadenas que han sido pasadas por linea de comandos
 */
 void Usage(int argc, char* argv[]) {
-  switch (argc) {
-    case 1: {
-      std::cerr << argv[0] << " Modo de empleo: ./Automata input.fa input.txt" << std::endl;
-      std::cerr << "Use: " << argv[0] << " --help para mas información" << std::endl;
-      exit(EXIT_SUCCESS);
-      break;
-    }
-    case 2: {
-      std::string parametro = argv[1];
-      if (parametro == "--help") {
-        std::cout << "Este programa simula el comportamiento de un automata" << std::endl;
-        std::cout << "Se necesita dos fichero, un .fa que contenga la definicion del automata y un .txt que contenga las cadenas a comprobar" << std::endl;
-        std::cout << helptext << std::endl;
-        exit(EXIT_SUCCESS);
-      }
-      else {
-        std::cerr << argv[0] << " Modo de empleo: ./Expreciones Entrada.cc Salida.txt" << std::endl;
-        std::cerr << "Use: " << argv[0] << " --help para mas información" << std::endl;
-        exit(EXIT_SUCCESS);
-      }
-      break;   
-    }
-    case 3: {
-      break;
-    }
-    default: {
-      std::cerr << argv[0] << " Modo de empleo: ./Expreciones Entrada.cc Salida.txt" << std::endl;
-      std::cerr << "Use: " << argv[0] << " --help para mas información" << std::endl;
-      exit(EXIT_SUCCESS); 
-      break;
-    }
+  if (argc == 3) return;
+  if (argc == 2 && std::string(argv[1]) == "--help") {
+    std::cout << "Este programa simula el comportamiento de un automata finito determinista (DFA)" << std::endl;
+    std::cout << "Uso: ./p06_DFA_simulator input.dfa input.txt" << std::endl;
+    std::cout << "Se necesitan dos ficheros, un .dfa que contenga la definicion del DFA y un .txt que contenga las cadenas a comprobar" << std::endl << std::endl;
+    std::cout << helptext << std::endl;
+    exit(EXIT_SUCCESS);
   }
+  std::cerr << "Modo de empleo: ./p06_DFA_simulator input.dfa input.txt" << std::endl;
+  std::cerr << "Pruebe 'p06_DFA_simulator --help' para más información." << std::endl;
+  exit(EXIT_FAILURE);
 }
 
 
@@ -62,7 +41,6 @@ void Usage(int argc, char* argv[]) {
 */
 void SimulacionAutomata(Automata automata, const std::string& fichero_cadenas) {
   Alfabeto alfabeto_automata = automata.getAlfabeto();
-  bool pertenece_alfabeto;
   std::ifstream entrada(fichero_cadenas); 
   if(!entrada.is_open()) {
     std::cerr << "El fichero de cadenas no se ha podido abrir" << std::endl;
@@ -70,20 +48,23 @@ void SimulacionAutomata(Automata automata, const std::string& fichero_cadenas) {
   }
   std::string cadenas; 
   while(std::getline(entrada, cadenas)) {
+    if (!cadenas.empty() && cadenas.back() == '\r') cadenas.pop_back();
+    if (cadenas.empty()) continue;
     Cadena cadena(cadenas);
-    std::vector<char> simbolos = cadena.getCadena();
-    for(char c : simbolos) {
-      pertenece_alfabeto = alfabeto_automata.search(c);
+    std::cout << "Cadena: " << cadena << std::endl;
+    bool pertenece_alfabeto = true;
+    if (cadenas != "&") {
+      for(char c : cadena.getCadena()) {
+        if (!alfabeto_automata.search(c)) pertenece_alfabeto = false;
+      }
     }
     if (pertenece_alfabeto) {
-      if (automata.Simulacion(cadena)) {
-        std::cout << cadena << " --- Accepted" << std::endl;
-      } else {
-        std::cout << cadena << " --- Rejected" << std::endl;
-      }
+      bool aceptada = automata.Simulacion(cadena);
+      std::cout << std::endl << "Cadena de entrada " << (aceptada ? "ACEPTADA." : "RECHAZADA.") << std::endl;
     } else {
-      std::cout << cadena << " No pertenece al alfabeto" << std::endl;
+      std::cout << "La cadena contiene simbolos que no pertenecen al alfabeto " << alfabeto_automata << std::endl;
     }
+    std::cout << std::endl;
   }
   entrada.close();
 }

@@ -3,7 +3,7 @@
 // Grado en Ingenierıa Informatica
 // Asignatura: Computabilidad y Algoritmia
 // Curso: 2º
-// Practica 6: Diseño e implementación deun simulador de autómatas finitos
+// Practica 6: Diseño e implementación de un simulador de DFAs
 // Autor: Joshua Gomez Marrero
 // Correo: alu0101477398@ull.edu.es
 // Fecha: 17/10/2025
@@ -23,9 +23,11 @@
 */
 Estado::Estado(const std::string& datos) {
   std::istringstream flujo(datos);
-  flujo >> id_;
   int aceptacion;
-  flujo >> aceptacion; 
+  if (!(flujo >> id_ >> aceptacion)) {
+    std::cerr << "Linea de estado mal formada: \"" << datos << "\"" << std::endl;
+    exit(EXIT_FAILURE);
+  }
   if (aceptacion == 1) {
     final_ = true;
   } else if (aceptacion == 0) {
@@ -34,17 +36,17 @@ Estado::Estado(const std::string& datos) {
     std::cerr << "El valor de acepacion es incorrecto, solo puede ser 0 o 1" << std::endl;
     exit(EXIT_FAILURE);
   }
-  flujo >> numero_transiciones_;
-  if (numero_transiciones_ != 0) {
-    for(int i = 0; i < numero_transiciones_; ++i) {
-      char simbolo; 
-      int destino;
-      if (!(flujo >> simbolo >> destino)) {
-        std::cerr << "Erro al leer la transicion nummero " << i << " en el estado " << id_ << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      transiciones_.insert({simbolo, destino});
+  // El resto de la linea son pares (simbolo, estado destino)
+  numero_transiciones_ = 0;
+  char simbolo;
+  while (flujo >> simbolo) {
+    int destino;
+    if (!(flujo >> destino)) {
+      std::cerr << "Error al leer la transicion con simbolo '" << simbolo << "' en el estado " << id_ << std::endl;
+      exit(EXIT_FAILURE);
     }
+    transiciones_.insert({simbolo, destino});
+    ++numero_transiciones_;
   }
 }
 

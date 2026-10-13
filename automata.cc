@@ -3,7 +3,7 @@
 // Grado en Ingenierıa Informatica
 // Asignatura: Computabilidad y Algoritmia
 // Curso: 2º
-// Practica 6: Diseño e implementación deun simulador de autómatas finitos
+// Practica 6: Diseño e implementación de un simulador de DFAs
 // Autor: Joshua Gomez Marrero
 // Correo: alu0101477398@ull.edu.es
 // Fecha: 17/10/2025
@@ -12,8 +12,60 @@
 #include <map>
 #include <set>
 #include <fstream>
+#include <iomanip>
+#include <cctype>
 
 #include "automata.h"
+
+
+
+/**
+ * @brief Lee la siguiente linea util del fichero, ignorando lineas vacias y comentarios (prefijo //)
+ * @param input Flujo de entrada del fichero
+ * @param linea Variable donde se almacena la linea leida
+ * @return true si se ha leido una linea, false si se llego al final del fichero
+*/
+static bool LeerLinea(std::ifstream& input, std::string& linea) {
+  while (std::getline(input, linea)) {
+    size_t inicio = linea.find_first_not_of(" \t\r");
+    if (inicio == std::string::npos) continue;
+    if (linea.compare(inicio, 2, "//") == 0) continue;
+    linea = linea.substr(inicio, linea.find_last_not_of(" \t\r") - inicio + 1);
+    return true;
+  }
+  return false;
+}
+
+
+
+/**
+ * @brief Muestra un mensaje de error en la definicion del DFA y termina el programa
+ * @param mensaje Descripcion del error
+*/
+static void ErrorDefinicion(const std::string& mensaje) {
+  std::cerr << "Error en la definicion del DFA: " << mensaje << std::endl;
+  exit(EXIT_FAILURE);
+}
+
+
+
+/**
+ * @brief Convierte una linea en un numero entero, abortando si no es valido
+ * @param linea Linea a convertir
+ * @param campo Nombre del campo, para el mensaje de error
+ * @return El numero leido
+*/
+static int LeerEntero(const std::string& linea, const std::string& campo) {
+  size_t procesados = 0;
+  int numero = 0;
+  try {
+    numero = std::stoi(linea, &procesados);
+  } catch (const std::exception&) {
+    ErrorDefinicion(campo + " no es un numero valido: \"" + linea + "\"");
+  }
+  if (procesados != linea.size()) ErrorDefinicion(campo + " no es un numero valido: \"" + linea + "\"");
+  return numero;
+}
 
 
 
@@ -24,106 +76,104 @@
 Automata::Automata(const std::string& fichero) {
   std::ifstream input(fichero); 
   if(!input.is_open()) {
-    std::cerr << "El fichero no se pudo abrir" << std::endl;
+    std::cerr << "El fichero " << fichero << " no se pudo abrir" << std::endl;
     exit(EXIT_FAILURE);
   }
   std::string linea_alfabeto, linea_estados, linea_inicio;
-  std::getline(input, linea_alfabeto);
-  std::getline(input, linea_estados);
-  std::getline(input, linea_inicio);
+  if (!LeerLinea(input, linea_alfabeto)) ErrorDefinicion("falta la linea del alfabeto");
+  if (!LeerLinea(input, linea_estados)) ErrorDefinicion("falta la linea con el numero de estados");
+  if (!LeerLinea(input, linea_inicio)) ErrorDefinicion("falta la linea con el estado de arranque");
+  for (char simbolo : linea_alfabeto) {
+    if (!std::isalnum(static_cast<unsigned char>(simbolo))) {
+      ErrorDefinicion(std::string("el simbolo '") + simbolo + "' del alfabeto no es alfanumerico");
+    }
+  }
   alfabeto_ = Alfabeto(linea_alfabeto);
-  numero_estados_ = std::stoi(linea_estados); 
-  estado_inicial_ = std::stoi(linea_inicio);
+  numero_estados_ = LeerEntero(linea_estados, "El numero de estados");
+  if (numero_estados_ <= 0) ErrorDefinicion("el DFA debe tener al menos un estado");
+  estado_inicial_ = LeerEntero(linea_inicio, "El estado de arranque");
   for(int i = 0; i < numero_estados_; i++) {
     std::string linea; 
-    std::getline(input, linea); 
+    if (!LeerLinea(input, linea)) {
+      ErrorDefinicion("se esperaban " + std::to_string(numero_estados_) + " lineas de estados y solo hay " + std::to_string(i));
+    }
     Estado estado = Estado(linea);
+    if (estados_.count(estado.getNombre())) {
+      ErrorDefinicion("el estado " + std::to_string(estado.getNombre()) + " esta definido mas de una vez");
+    }
     estados_.insert({estado.getNombre(), estado});
     if(estado.getFinal()) {
       estados_finales_.insert(estado.getNombre());
     }
   }
+  std::string sobrante;
+  if (LeerLinea(input, sobrante)) {
+    ErrorDefinicion("hay mas lineas de estados que el numero de estados indicado (" + std::to_string(numero_estados_) + ")");
+  }
   input.close();
+  Validar();
 }
 
 
 
 /**
- * @brief Metodo que Simula el funcionamiento del automata para comporbar cadenass
+ * @brief Comprueba que la definicion leida corresponde a un DFA correcto
+*/
+void Automata::Validar(void) {
+  if (!estados_.count(estado_inicial_)) {
+    ErrorDefinicion("el estado de arranque " + std::to_string(estado_inicial_) + " no es un estado del automata");
+  }
+  for (auto& par : estados_) {
+    int id = par.first;
+    if (id < 0 || id >= numero_estados_) {
+      ErrorDefinicion("el estado " + std::to_string(id) + " no esta en el rango [0, " + std::to_string(numero_estados_ - 1) + "]");
+    }
+    const std::multimap<char, int> transiciones = par.second.getTransiciones();
+    for (const auto& transicion : transiciones) {
+      if (!alfabeto_.search(transicion.first)) {
+        ErrorDefinicion(std::string("la transicion del estado ") + std::to_string(id) + " con el simbolo '" + transicion.first + "' usa un simbolo que no pertenece al alfabeto");
+      }
+      if (!estados_.count(transicion.second)) {
+        ErrorDefinicion("la transicion del estado " + std::to_string(id) + " lleva al estado " + std::to_string(transicion.second) + ", que no existe");
+      }
+    }
+    // En un DFA hay exactamente una transicion por cada simbolo del alfabeto
+    for (char simbolo : alfabeto_.getSimbolos()) {
+      size_t numero = transiciones.count(simbolo);
+      if (numero != 1) {
+        ErrorDefinicion(std::string("el estado ") + std::to_string(id) + " tiene " + std::to_string(numero) + " transiciones con el simbolo '" + simbolo + "' (debe tener exactamente una)");
+      }
+    }
+  }
+}
+
+
+
+/**
+ * @brief Metodo que Simula el funcionamiento del automata para comprobar cadenas, mostrando la traza
  * @param cadena Objeto Cadena a comprobar por el automata
- * @return bool que determina si una cadena es o no acpetada por el automata
+ * @return bool que determina si una cadena es o no aceptada por el automata
 */
 const bool Automata::Simulacion(Cadena cadena) {
   std::vector<char> simbolos = cadena.getCadena();
-  std::set<int> estados_actuales = {estado_inicial_};
+  if (cadena.longitud() == 0) simbolos.clear(); // La cadena vacia (&) no consume simbolos
+  int estado_actual = estado_inicial_;
 
+  std::cout << "Est. Actual  Entrada  Nuevo Est." << std::endl;
   //Recorremos cada simbolo de la cadena
   for(char c : simbolos) {
-    std::set<int> siguientes;
-
-    //Para cada estado actual buscamos transiciones con ese simbolo
-    for(int e : estados_actuales) {
-      const auto& transiciones = estados_.at(e).getTransiciones();
-      auto rango = transiciones.equal_range(c);
-      for (auto it = rango.first; it != rango.second; ++it) {
-        int destino = it->second;
-        siguientes.insert(destino);
-      }
-    }
-    estados_actuales = std::move(siguientes);
-
-    //Si en algun momento no hay estados posibles, podemos cortar
-    if (estados_actuales.empty()) return false;
+    //En un DFA hay una unica transicion para el estado actual y el simbolo
+    int estado_siguiente = estados_.at(estado_actual).getTransiciones().find(c)->second;
+    std::cout << std::setw(7) << estado_actual << std::setw(10) << c << std::setw(11) << estado_siguiente << std::endl;
+    estado_actual = estado_siguiente;
   }
   
-  //Finalmente buscamos si el estado actual es final para aceptar
-  for(int e : estados_actuales) {
-    if (estados_finales_.count(e)) return true;
-  }
-  return false;
+  //Finalmente comprobamos si el estado alcanzado es final para aceptar
+  return estados_finales_.count(estado_actual) > 0;
 }
 
 
 
-/**
- * @brief Sobrecarga del insercion de extraccion para el objeto Automata
- * @param entrada Variable para recibir la entrada de datos
- * @param Automata Objeto automata que va a ser sobreescrito
- * @return entrada Retornamos el nuevo valor 
-*/
-void Automata::Gramatica() {
-  std::ofstream out("gramatica.txt"); 
-  out << alfabeto_ << std::endl;
-  out << numero_estados_ << std::endl;
-  std::vector<char> nuevos_id; 
-  for (int i = 0; i < numero_estados_; ++i) {
-    nuevos_id.push_back(estados_.at(i).getNombre() + 'A');
-  }
-  out << nuevos_id[0] << std::endl;
-
-  for (auto it = estados_.begin(); it != estados_.end(); ++it) {
-    int iterador = 0;
-    int id = it->first;
-    const Estado& estado = it->second;
-
-    std::vector<std::string> producciones;
-    const std::multimap<char, int>& transiciones = estados_.at(iterador).getTransiciones();
-
-    for (auto t = transiciones.begin(); t != transiciones.end(); ++t) {
-      char simbolo = t->first;
-      int destino = t->second;
-
-      if (std::isdigit(simbolo)) simbolo = 'A' + (simbolo - '0');
-
-      std::string prod;
-      prod += simbolo;
-      prod += "Q" + std::to_string(destino);
-      producciones.push_back(prod);
-    }
-    out << producciones[iterador] << std::endl;
-    iterador++;
-  }
-}
 /**
  * @brief Sobrecarga del insercion de extraccion para el objeto Automata
  * @param entrada Variable para recibir la entrada de datos
